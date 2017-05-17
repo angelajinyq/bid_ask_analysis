@@ -51,4 +51,4 @@ plot.show <- function(trajectory, time=1, harmonics=-1, plot.freq=FALSE) {
   }
 }
 
-plot.frequency.spectrum(spread_fft,xlimits=c(0,10,0.01))
+plot.frequency.spectrum(spread_fft)
