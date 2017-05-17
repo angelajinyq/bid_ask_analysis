@@ -1,0 +1,54 @@
+data = read.csv("aapl_intraday.csv")
+bid = as.numeric(unlist(as.vector(data['BID'])))
+ask = as.numeric(unlist(as.vector(data['ASK'])))
+spread = ask - bid
+spread_fft = fft(spread)/length(spread) # divide by the length to normalize
+spread_fft_mag = abs(spread_fft)
+
+plot.frequency.spectrum <- function(X.k, xlimits=c(0,length(X.k))) {
+  plot.data  <- cbind(0:(length(X.k)-1), Mod(X.k))
+  
+  # TODO: why this scaling is necessary?
+  plot.data[2:length(X.k),2] <- 2*plot.data[2:length(X.k),2] 
+  
+  plot(plot.data, t="h", lwd=2, main="", 
+       xlab="Frequency (Hz)", ylab="Strength", 
+       xlim=xlimits, ylim=c(0,max(Mod(plot.data[,2]))))
+}
+plot.harmonic <- function(Xk, i, ts, acq.freq, color="red") {
+  Xk.h <- rep(0,length(Xk))
+  Xk.h[i+1] <- Xk[i+1] # i-th harmonic
+  harmonic.trajectory <- get.trajectory(Xk.h, ts, acq.freq=acq.freq)
+  points(ts, harmonic.trajectory, type="l", col=color)
+}
+plot.show <- function(trajectory, time=1, harmonics=-1, plot.freq=FALSE) {
+  
+  acq.freq <- length(trajectory)/time      # data acquisition frequency (Hz)
+  ts  <- seq(0,time-1/acq.freq,1/acq.freq) # vector of sampling time-points (s) 
+  
+  X.k <- fft(trajectory)
+  x.n <- get.trajectory(X.k,ts, acq.freq=acq.freq) / acq.freq
+  
+  if (plot.freq)
+    plot.frequency.spectrum(X.k)
+  
+  max.y <- ceiling(1.5*max(Mod(x.n)))
+  
+  if (harmonics[1]==-1) {
+    min.y <- floor(min(Mod(x.n)))-1
+  } else {
+    min.y <- ceiling(-1.5*max(Mod(x.n)))
+  }
+  
+  plot(ts,x.n, type="l",ylim=c(min.y,max.y))
+  abline(h=min.y:max.y,v=0:time,lty=3)
+  points(ts,trajectory,pch=19,col="red")  # the data points we know
+  
+  if (harmonics[1]>-1) {
+    for(i in 0:length(harmonics)) {
+      plot.harmonic(X.k, harmonics[i], ts, acq.freq, color=i+1)
+    }
+  }
+}
+
+plot.frequency.spectrum(spread_fft,xlimits=c(0,10,0.01))
