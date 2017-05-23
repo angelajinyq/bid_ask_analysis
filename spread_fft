@@ -2,6 +2,15 @@ data = read.csv("aapl_intraday.csv")
 bid = as.numeric(unlist(as.vector(data['BID'])))
 ask = as.numeric(unlist(as.vector(data['ASK'])))
 spread = ask - bid
+
+sum(bid == 0) # there are 4190 zeros in bid - I assume these are bad values
+sum(ask == 0) # there are 6178 zeros in ask
+# remove bad values of spread bigger than 100
+spread = spread[spread < 100 & spread > -100] # there are still some wired values..
+# plot spread from -0.1 ~ 0.1
+# I tried a few different scopes and this one gives more information
+hist(spread, xlim = c(-0.1,0.3), breaks = 10000)
+
 spread_fft = fft(spread)/length(spread) # divide by the length to normalize
 spread_fft_mag = abs(spread_fft)
 
