@@ -1,0 +1,7 @@
+tick data is inheretly nonhomogenous
+  book updates/ trade updates/ exchange messages and high-frequency news feeds
+eg. SPY ETF ~ 10-20 mio book updates
+  orderbook placement/ modification and cancellation requests between humans/ algorithms/ the exahnge
+  small number of actual trades
+def. book update - a change in price/ quantity/ count at a certain level of the orderbook
+
